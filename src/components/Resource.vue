@@ -31,31 +31,17 @@ export default toNative(Resource);
     color: white;
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
 
-    border: 1px solid;
+    border: 2px solid;
     border-color: transparent;
 
     transition: all .1s;
 }
 
 .resource:hover {
-    background-color: #E5CFF7;
-    color: black;
-
-    border-color: #9D76C1;
+    background-color: #9167b8;
+    border-color: #E5CFF7;
     cursor: pointer;
 
     transition: all .1s;
-}
-
-.resource h2 {
-    color: white;
-
-    transition: color .1s;
-}
-
-.resource:hover h2 {
-    color: #5B0888;
-
-    transition: color .3s;
 }
 </style>
