@@ -1,7 +1,6 @@
 <script lang="ts">
 import { Component, Emit, Prop, Vue, toNative } from 'vue-facing-decorator'
 import ResourceDTO from '@/models/ResourceDTO';
-import DialogButtonDTO from '@/models/DialogButtonDTO';
 import ToastDTO from '@/models/ToastDTO';
 import DialogOverlay from '@/components/DialogOverlay.vue';
 import Resource from '@/components/Resource.vue';
@@ -20,29 +19,6 @@ class ResourceListing extends Vue {
     @Prop({ default: [] })
     resourceCategories!: ResourceCategoryDTO[];
 
-    redirectDialogOpen: boolean = false;
-    redirectDialogLink: string = '';
-
-    dialogButtons: DialogButtonDTO[] = [];
-
-    openRedirectDialog(resource: ResourceDTO) {
-        this.redirectDialogLink = resource.link;
-        this.redirectDialogOpen = true;
-        
-        this.dialogButtons = [];
-        this.dialogButtons.push(new DialogButtonDTO('Visit', () => window.open(resource.link, '_blank')))
-        this.dialogButtons.push(new DialogButtonDTO('Delete', () => this.deleteResource(resource)))
-        this.dialogButtons.push(new DialogButtonDTO('Cancel'))
-    }
-
-    closeRedirectDialog() {
-        this.redirectDialogOpen = false;
-    }
-
-    get redirectDialogText() {
-        return 'Do you want to open "' + this.redirectDialogLink + '"?';
-    }
-
     @Emit
     deleteResource(resource: ResourceDTO) {
         this.addToast(
@@ -56,6 +32,11 @@ class ResourceListing extends Vue {
     addToast(toast: ToastDTO) {
         return toast;
     }
+
+    @Emit
+    resourceClick(resource: ResourceDTO) {
+        return resource;
+    }
 }
 
 export default toNative(ResourceListing);
@@ -64,11 +45,8 @@ export default toNative(ResourceListing);
 
 <template>
     <div class="wrapper">
-        <ResourceCategory v-for="category in resourceCategories" :key="category.id" :category="category" @resourceClick="openRedirectDialog" />
+        <ResourceCategory v-for="category in resourceCategories" :key="category.id" :category="category" @resourceClick="resourceClick" />
     </div>
-
-    <DialogOverlay :isOpen="redirectDialogOpen" :text="redirectDialogText" :buttons="dialogButtons"
-    @onButtonClick="closeRedirectDialog()" />
 </template>
 
 <style scoped>

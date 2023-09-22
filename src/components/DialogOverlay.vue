@@ -39,7 +39,7 @@ export default toNative(DialogOverlay);
 
 <template>
     <teleport to="#app" v-if="isOpen">
-        <div class="dialogWrapper">
+        <div class="dialog-wrapper">
             <dialog open>
                 <p>{{ text }}</p>
                 <div class="button-container">
@@ -54,11 +54,11 @@ export default toNative(DialogOverlay);
 </template>
 
 <style scoped>
-.dialogWrapper {
+.dialog-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
+    position: fixed;
 
     left: 0;
     top: 0;

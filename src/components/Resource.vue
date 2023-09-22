@@ -6,13 +6,16 @@ import { Component, Prop, Vue, toNative } from 'vue-facing-decorator';
 class Resource extends Vue {
     @Prop({ required: true })
     resource!: ResourceDTO;
+
+    @Prop({ default: ''})
+    key!: string;
 }
 
 export default toNative(Resource);
 </script>
 
 <template>
-<div class="resource">
+<div class="resource" :key="key">
     <h2>{{ resource.title }}</h2>
     <p>{{ resource.description }}</p>
 </div>
