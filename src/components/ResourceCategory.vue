@@ -15,13 +15,6 @@ class ResourceCategory extends Vue {
     @Prop({ required: true })
     category!: ResourceCategoryDTO;
 
-    @Prop({ default: [] })
-    resources!: ResourceDTO[];
-
-    filterResources() {
-        return this.resources.filter(x => x.categoryID === this.category.id);
-    }
-
     open() {
 
     }
@@ -44,7 +37,7 @@ export default toNative(ResourceCategory);
     <h2>{{ category.name }}</h2>
 </div>
 <div class="content">
-    <draggable v-model="resources" group="categories">
+    <draggable v-model="category.resources" group="categories">
         <template #item="{ element: resource }">
             <Resource draggable="true" @click="resourceClick(resource)" :resource="resource" />
         </template>

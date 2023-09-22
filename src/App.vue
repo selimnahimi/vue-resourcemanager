@@ -4,6 +4,7 @@ import ResourceListing from '@/components/ResourceListing.vue';
 import NewResource from '@/components/NewResource.vue';
 import ToastOverlay from '@/components/ToastOverlay.vue';
 import ResourceDTO from '@/models/ResourceDTO';
+import NewResourceDTO from '@/models/NewResourceDTO';
 import type ToastDTO from './models/ToastDTO';
 import ResourceCategoryDTO from './models/ResourceCategoryDTO';
 import ResourceCategory from './components/ResourceCategory.vue';
@@ -18,15 +19,14 @@ import ResourceCategory from './components/ResourceCategory.vue';
 })
 class App extends Vue {
   resourceCategories: ResourceCategoryDTO[] = [
-    new ResourceCategoryDTO('Technologies', 0),
-    new ResourceCategoryDTO('Forums', 1)
+    new ResourceCategoryDTO('Technologies', 0, [
+      new ResourceDTO('Vue.js', 'The official Vue.js website', 'https://vuejs.org/'),
+      new ResourceDTO('Node.js', 'The official Node.js website', 'https://nodejs.org/')
+    ]),
+    new ResourceCategoryDTO('Forums', 1, [
+      new ResourceDTO('Stack Overflow', 'A website for programming Q&A', 'https://stackoverflow.com/')
+    ])
   ];
-
-  resources: ResourceDTO[] = [
-    new ResourceDTO('Vue.js', 'The official Vue.js website', 'https://vuejs.org/', 0),
-    new ResourceDTO('Node.js', 'The official Node.js website', 'https://nodejs.org/', 0),
-    new ResourceDTO('Stack Overflow', 'A website for programming Q&A', 'https://stackoverflow.com/', 1)
-  ]
 
   toasts: ToastDTO[] = [];
 
@@ -36,12 +36,17 @@ class App extends Vue {
     this.currentPage = page;
   }
 
-  addResource(resource: ResourceDTO): void {
-    this.resources.push(resource);
+  addResource(newResource: NewResourceDTO): void {
+    let resource = new ResourceDTO(newResource.title, newResource.description, newResource.link, newResource.id)
+
+    let category = this.resourceCategories.find(x => x.id === newResource.categoryID);
+    category?.resources.push(resource);
   }
 
   deleteResource(resource: ResourceDTO): void {
-    this.resources = this.resources.filter(x => x.id !== resource.id);
+    this.resourceCategories.forEach(category => {
+      category.resources = category.resources.filter(x => x.id !== resource.id);
+    });
   }
 
   addToast(toast: ToastDTO): void {
@@ -84,7 +89,7 @@ export default toNative(App);
   </header>
 
   <main v-if="currentPage === 'resource-listing'">
-    <ResourceListing :resourceCategories="resourceCategories" :resources="resources" @deleteResource="deleteResource" @addToast="addToast" />
+    <ResourceListing :resourceCategories="resourceCategories" @deleteResource="deleteResource" @addToast="addToast" />
   </main>
 
   <main v-if="currentPage === 'new-resource'">

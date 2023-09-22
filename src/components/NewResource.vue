@@ -1,7 +1,7 @@
 <script lang="ts">
 import Toast from '@/components/Toast.vue';
+import NewResourceDTO from '@/models/NewResourceDTO';
 import ResourceCategoryDTO from '@/models/ResourceCategoryDTO';
-import ResourceDTO from '@/models/ResourceDTO';
 import ToastDTO from '@/models/ToastDTO';
 import { Component, Emit, Prop, Vue, toNative } from 'vue-facing-decorator';
 
@@ -73,7 +73,7 @@ class NewResource extends Vue {
             this.categoryID = newestCategory?.id || 0;
         }
 
-        return new ResourceDTO(this.title, this.desc, this.link, this.categoryID);
+        return new NewResourceDTO(this.title, this.desc, this.link, this.categoryID);
     }
 
     @Emit

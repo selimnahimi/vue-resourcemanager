@@ -18,9 +18,6 @@ import ResourceCategory from './ResourceCategory.vue';
 })
 class ResourceListing extends Vue {
     @Prop({ default: [] })
-    resources!: ResourceDTO[];
-
-    @Prop({ default: [] })
     resourceCategories!: ResourceCategoryDTO[];
 
     redirectDialogOpen: boolean = false;
@@ -67,7 +64,7 @@ export default toNative(ResourceListing);
 
 <template>
     <div class="wrapper">
-        <ResourceCategory v-for="category in resourceCategories" :key="category.id" :category="category" :resources="resources" @resourceClick="openRedirectDialog" />
+        <ResourceCategory v-for="category in resourceCategories" :key="category.id" :category="category" @resourceClick="openRedirectDialog" />
     </div>
 
     <DialogOverlay :isOpen="redirectDialogOpen" :text="redirectDialogText" :buttons="dialogButtons"
