@@ -2,20 +2,26 @@
 import { Component, Emit, Prop, Vue, toNative } from 'vue-facing-decorator'
 import ResourceDTO from '@/models/ResourceDTO';
 import DialogButtonDTO from '@/models/DialogButtonDTO';
-import DialogOverlay from '@/components/DialogOverlay.vue';
 import ToastDTO from '@/models/ToastDTO';
+import DialogOverlay from '@/components/DialogOverlay.vue';
+import Resource from '@/components/Resource.vue';
+import type ResourceCategoryDTO from '@/models/ResourceCategoryDTO';
+import ResourceCategory from './ResourceCategory.vue';
 
 @Component({
     name: 'ResourceListing',
     components: {
-        DialogOverlay
+        DialogOverlay,
+        Resource,
+        ResourceCategory
     }
 })
 class ResourceListing extends Vue {
-    @Prop({
-        default: []
-    })
+    @Prop({ default: [] })
     resources!: ResourceDTO[];
+
+    @Prop({ default: [] })
+    resourceCategories!: ResourceCategoryDTO[];
 
     redirectDialogOpen: boolean = false;
     redirectDialogLink: string = '';
@@ -61,11 +67,7 @@ export default toNative(ResourceListing);
 
 <template>
     <div class="wrapper">
-        <div class="resource" v-for="resource in resources" :key="resource.title"
-        @click="openRedirectDialog(resource)">
-            <h2>{{ resource.title }}</h2>
-            <p>{{ resource.description }}</p>
-        </div>
+        <ResourceCategory v-for="category in resourceCategories" :key="category.id" :category="category" :resources="resources" @resourceClick="openRedirectDialog" />
     </div>
 
     <DialogOverlay :isOpen="redirectDialogOpen" :text="redirectDialogText" :buttons="dialogButtons"
@@ -76,45 +78,8 @@ export default toNative(ResourceListing);
 
 .wrapper {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: space-between;
     padding: 2rem;
-}
-
-.resource {
-    flex: 1 40%;
-    margin: 1rem;
-    padding: 1rem 1rem;
-
-    background-color: #9D76C1;
-    color: white;
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-
-    border: 1px solid;
-    border-color: transparent;
-
-    transition: all .3s;
-}
-
-.resource:hover {
-    background-color: #E5CFF7;
-    color: black;
-
-    border-color: #9D76C1;
-    cursor: pointer;
-
-    transition: all .3s;
-}
-
-.resource h2 {
-    color: white;
-
-    transition: color .3s;
-}
-
-.resource:hover h2 {
-    color: #5B0888;
-
-    transition: color .3s;
 }
 </style>

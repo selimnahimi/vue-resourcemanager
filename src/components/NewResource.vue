@@ -1,8 +1,9 @@
 <script lang="ts">
 import Toast from '@/components/Toast.vue';
+import ResourceCategoryDTO from '@/models/ResourceCategoryDTO';
 import ResourceDTO from '@/models/ResourceDTO';
 import ToastDTO from '@/models/ToastDTO';
-import { Component, Emit, Vue, toNative } from 'vue-facing-decorator';
+import { Component, Emit, Prop, Vue, toNative } from 'vue-facing-decorator';
 
 @Component({
     components: {
@@ -10,13 +11,18 @@ import { Component, Emit, Vue, toNative } from 'vue-facing-decorator';
     }
 })
 class NewResource extends Vue {
+    private urlRegex = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi);
+
+    @Prop({ default: [] })
+    resourceCategories!: ResourceCategoryDTO[];
+
     title: string = '';
     desc: string = '';
     link: string = '';
+    categoryID: number = 0;
+    newCategoryName: string = '';
 
-    private urlRegex = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)/gi);
-
-    toasts: {text: string, type: string, id: number}[] = [];
+    toasts: ToastDTO[] = [];
 
     tryAddResource() {
         let errorText: string | undefined = undefined;
@@ -29,6 +35,9 @@ class NewResource extends Vue {
         if (!this.urlRegex.test(this.link))
             errorText = 'The link is invalid!';
 
+        if (this.isNewCategory() && this.newCategoryName === '')
+            errorText = 'The category name can\'t be empty!';
+
         if (errorText) {
             this.addToast(
                 new ToastDTO(errorText, 'err')
@@ -37,7 +46,20 @@ class NewResource extends Vue {
             return;
         }
 
+        if (this.isNewCategory()) {
+            this.addCategory();
+        }
+
         this.addResource();
+    }
+
+    @Emit
+    addCategory() {
+        this.addToast(
+            new ToastDTO(`Succesfully created category "${this.newCategoryName}"!`, 'ok')
+        )
+
+        return new ResourceCategoryDTO(this.newCategoryName);
     }
 
     @Emit
@@ -46,7 +68,12 @@ class NewResource extends Vue {
             new ToastDTO(`Successfully added ${this.title}!`, 'ok')
         );
 
-        return new ResourceDTO(this.title, this.desc, this.link);
+        if (this.isNewCategory()) {
+            let newestCategory = this.getLastCategory();
+            this.categoryID = newestCategory?.id || 0;
+        }
+
+        return new ResourceDTO(this.title, this.desc, this.link, this.categoryID);
     }
 
     @Emit
@@ -57,6 +84,17 @@ class NewResource extends Vue {
     @Emit
     removeToast(toast: ToastDTO) {
         return toast;
+    }
+
+    private isNewCategory(): boolean {
+        return this.categoryID === -1;
+    }
+
+    private getLastCategory(): ResourceCategoryDTO | undefined {
+    if (this.resourceCategories.length === 0)
+        return undefined;
+
+    return this.resourceCategories[this.resourceCategories.length-1];
     }
 }
 
@@ -69,6 +107,11 @@ export default toNative(NewResource);
     <input placeholder="Title" class="title" v-model="title">
     <input placeholder="Description" class="description" v-model="desc">
     <input placeholder="Link" class="link" v-model="link">
+    <select class="category" v-model="categoryID">
+        <option v-for="category in resourceCategories" :value="category.id" :key="category.id">{{ category.name }}</option>
+        <option :value="-1">New Category...</option>
+    </select>
+    <input v-if="categoryID === -1" placeholder="Category Name" class="category-name" v-model="newCategoryName">
     <button @click="tryAddResource()">Add Resource</button>
 </div>
 
